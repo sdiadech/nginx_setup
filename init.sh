@@ -22,9 +22,9 @@ cp ./conf/hello.py /home/box/web/etc/
 cp ./conf/ask.conf /home/box/web/etc/
 
 #sudo ln -sf /home/box/web/etc/hello.py /etc/gunicorn.d/hello.py
-#sudo ln -sf /home/box/web/etc/ask.conf /etc/gunicorn.d/ask
+sudo ln -sf /home/box/web/etc/ask.conf /etc/gunicorn.d/ask
 
 sudo /etc/init.d/gunicorn restart
-sudo gunicorn -c /home/box/web/etc/hello.py hello:application
-sudo gunicorn -c /home/box/web/etc/ask.conf
+#sudo gunicorn -c /home/box/web/etc/hello.py hello:application
+#sudo gunicorn -c /home/box/web/etc/ask.conf
 #sudo gunicorn -b 0.0.0.0:8080 hello:application
