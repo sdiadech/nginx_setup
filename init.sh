@@ -32,5 +32,5 @@ sudo /etc/init.d/gunicorn restart
 sudo /etc/init.d/mysql start
 mysql -uroot -e "CREATE DATABASE ask;"
 cd ask
-./manage.py syncdb
+./manage.py makemigrations
 ./manage.py runserver 0.0.0.0:8000
