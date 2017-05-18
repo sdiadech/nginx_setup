@@ -28,3 +28,9 @@ sudo /etc/init.d/gunicorn restart
 #sudo gunicorn -c /home/box/web/etc/hello.py hello:application
 #sudo gunicorn -c /home/box/web/etc/ask.conf
 #sudo gunicorn -b 0.0.0.0:8080 hello:application
+
+sudo /etc/init.d/mysql start
+mysql -uroot -e "CREATE DATABASE ask;"
+cd ask
+./manage.py syncdb
+./manage.py runserver 0.0.0.0:8000

@@ -1,3 +1,33 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+
+class Question(models.Model):
+    title = models.CharField(max_length=50)
+    text = models.TextField()
+    added_at = models.DateTimeField()
+    rating = models.IntegerField()
+    author = models.ForeignKey(User, related_name='question_author')
+    likes = models.ManyToManyField(User, related_name='question_likes')
+
+    def __unicode__(self):
+        return self.title
+
+
+class QuestionManager(models.Manager):
+
+    def new(self):
+        return Question.objects.order_by('-added_at')
+
+    def popular(self):
+        return Question.objects.order_by('-rating')
+
+
+class Answer(models.Model):
+    text = models.TextField()
+    added_at = models.DateTimeField()
+    question = models.ForeignKey(Question)
+    author = models.ForeignKey(User, related_name='answer_author')
+
+    def __unicode__(self):
+        return self.title
