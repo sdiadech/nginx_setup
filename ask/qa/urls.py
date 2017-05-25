@@ -19,10 +19,10 @@ from . import views
 
 urlpatterns = [
     url(r'^login/', views.test),
-    url(r'^$', views.test),
+    url(r'^$', views.new),
     url(r'^signup/', views.test),
-    url(r'^question/(\d+)/', views.test),
+    url(r'^question/(?P<question_pk>[0-9]+)/$', views.question, name='question'),
     url(r'^ask/', views.test),
-    url(r'^popular/', views.test),
-    url(r'^new/', views.test),
+    url(r'^popular/', views.popular),
+    url(r'^new/', views.new),
 ]

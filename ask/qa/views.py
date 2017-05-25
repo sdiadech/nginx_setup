@@ -9,6 +9,13 @@ def test(request, *args, **kwargs):
     return HttpResponse('OK')
 
 
+def question(request, question_pk):
+    q = get_object_or_404(Question, pk=question_pk)
+    answers = Answer.objects.filter(question=q)
+
+    return render(request, 'question.html', {'question': q, 'answers': answers})
+
+
 def popular(request):
     questions = Question.objects.popular()
     paginator = Paginator(questions, 10)
