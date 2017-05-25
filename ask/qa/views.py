@@ -2,8 +2,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.models import User
 from .models import Question, Answer
+from .forms import AskForm, AnswerForm
 
+import string
+import random
 
 def test(request, *args, **kwargs):
     return HttpResponse('OK')
@@ -12,9 +16,33 @@ def test(request, *args, **kwargs):
 def question(request, question_pk):
     q = get_object_or_404(Question, pk=question_pk)
     answers = Answer.objects.filter(question=q)
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.author = request.user
+            answer.question = q
+            answer.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        form = AnswerForm(initial={'question': q})
 
     return render(request, 'question.html', {'question': q, 'answers': answers})
 
+
+
+def random_user():
+    name = ''
+    while True:
+        for i in range(10):
+            name += random.choice(string.ascii_letters)
+        try:
+            User.objects.get(username=name)
+        except User.DoesNotExist:
+            user = User.objects.create_user(
+                username=name, email='hi@there.com', password='666')
+            break
+    return user
 
 def popular(request):
     questions = Question.objects.popular()
