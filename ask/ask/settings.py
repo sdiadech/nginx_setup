@@ -51,11 +51,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'ask.urls'
-
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(SETTINGS_PATH, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,6 +69,7 @@ TEMPLATES = [
 ]
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'), )
+#TEMPLATE_DIRS = (os.path.join('/root/PycharmProjects/test_nginx/ask', 'templates'), )
 WSGI_APPLICATION = 'ask.wsgi.application'
 
 
