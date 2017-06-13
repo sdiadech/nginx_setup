@@ -26,6 +26,7 @@ SECRET_KEY = 'o+n=j0b380eb#!kand1l1z0984*22+su+@#g5w_(=451z^ca6_'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+FIXTURE_DIRS = (os.path.join(BASE_DIR, 'fixtures'), )
 
 
 # Application definition
