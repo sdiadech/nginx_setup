@@ -30,6 +30,21 @@ def question(request, question_pk):
     return render(request, 'question.html', {'question': q, 'answers': answers})
 
 
+def ask(request):
+    if request.method == 'POST':
+        form = AskForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            try:
+                question.author = request.user
+            except ValueError:
+                question.author = random_user()
+            question.save()
+            return HttpResponseRedirect(reverse('question', kwargs={'question_pk': question.pk}))
+    else:
+        form = AskForm()
+    return render(request, 'ask.html', {'form': form})
+
 
 def random_user():
     name = ''
@@ -43,6 +58,7 @@ def random_user():
                 username=name, email='hi@there.com', password='666')
             break
     return user
+
 
 def popular(request):
     questions = Question.objects.popular()
