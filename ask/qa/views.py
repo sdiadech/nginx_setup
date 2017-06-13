@@ -8,6 +8,14 @@ from .forms import AskForm, AnswerForm
 
 import string
 import random
+import logging
+
+#logger = logging.getLogger(__name__)
+#file_handler = logging.FileHandler('%s' % 'django.log')
+#file_handler.setLevel(logging.DEBUG)
+#logger.addHandler(file_handler)
+logging.basicConfig(filename='django.log', level=logging.DEBUG)
+
 
 def test(request, *args, **kwargs):
     return HttpResponse('OK')
@@ -31,17 +39,28 @@ def question(request, question_pk):
 
 
 def ask(request):
+    logging.debug('Ask method running')
     if request.method == 'POST':
+        logging.debug('POST method using in ask')
         form = AskForm(request.POST)
         if form.is_valid():
-            question = form.save(commit=False)
+            logging.debug('Form is valid')
+            #question = form.save(commit=False)
+            '''
+            logger.debug('Message')
             try:
                 question.author = request.user
             except ValueError:
                 question.author = random_user()
             question.save()
             return HttpResponseRedirect(reverse('question', kwargs={'question_pk': question.pk}))
+            '''
+            form._user = request.user
+            question = form.save()
+            url = reverse('question', kwargs={'question_pk': question.pk})
+            return HttpResponseRedirect(url)
     else:
+        logging.debug('GET method using')
         form = AskForm()
     return render(request, 'ask.html', {'form': form})
 
