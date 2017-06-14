@@ -2,64 +2,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.models import User
 from .models import Question, Answer
-from .forms import AskForm, AnswerForm
+from .forms import AskForm, AnswerForm, SignupForm, LoginForm
+
+from django.contrib.auth.models import User
+
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth import login as log_in
 
 import string
 import random
-#import logging
-
-#logging.basicConfig(filename='django.log', level=logging.DEBUG)
-
-
-def log(message):
-    with open('django.log', 'a+') as f:
-        f.write(message)
-
-
-def test(request, *args, **kwargs):
-    return HttpResponse('OK')
-
-
-def question(request, question_pk):
-    q = get_object_or_404(Question, pk=question_pk)
-    answers = Answer.objects.filter(question=q)
-    if request.method == 'POST':
-        form = AnswerForm(request.POST)
-        if form.is_valid():
-            answer = form.save(commit=False)
-            answer.author = request.user
-            answer.question = q
-            answer.save()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    else:
-        form = AnswerForm(initial={'question': q})
-
-    return render(request, 'question.html', {'question': q, 'answers': answers})
-
-
-def ask(request):
-    log('Before condition\n')
-    if request.method == 'POST':
-        log('POST\n')
-        form = AskForm(request.POST)
-        log('%s' % form)
-        if form.is_valid():
-            log('form is vaild')
-            question = form.save(commit=False)
-
-            try:
-                question.author = request.user
-            except ValueError:
-                question.author = random_user()
-            question.save()
-            return HttpResponseRedirect(reverse('question', kwargs={'question_pk': question.pk}))
-
-    else:
-        log('GET')
-        form = AskForm()
-    return render(request, 'ask.html', {'form': form})
 
 
 def random_user():
@@ -74,6 +26,75 @@ def random_user():
                 username=name, email='hi@there.com', password='666')
             break
     return user
+
+
+def test(request, *args, **kwargs):
+    return HttpResponse('OK')
+
+
+def login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            if user is not None:
+                log_in(request, user)
+                return HttpResponseRedirect(reverse('new'))
+    form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            username = user.username
+            email = user.email
+            password = user.password
+            new_user = User.objects.create_user(username, email, password)
+            new_user.save()
+            new_user = authenticate(username=username, password=password)
+            log_in(request, new_user)
+            return HttpResponseRedirect(reverse('new'))
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+def ask(request):
+
+    if request.method == 'POST':
+        form = AskForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            try:
+                question.author = request.user
+            except ValueError:
+                question.author = random_user()
+            question.save()
+            return HttpResponseRedirect(reverse('question', kwargs={'question_pk': question.pk}))
+    else:
+        form = AskForm()
+    return render(request, 'ask.html', {'form': form})
+
+
+def question(request, question_pk):
+    q = get_object_or_404(Question, pk=question_pk)
+    answers = Answer.objects.filter(question=q)
+
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.author = request.user
+            answer.question = q
+            answer.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        form = AnswerForm(initial={'question': q})
+
+    return render(request, 'question.html', {'question': q, 'answers': answers, 'form': form})
 
 
 def popular(request):
