@@ -8,9 +8,14 @@ from .forms import AskForm, AnswerForm
 
 import string
 import random
-import logging
+#import logging
 
-logging.basicConfig(filename='django.log', level=logging.DEBUG)
+#logging.basicConfig(filename='django.log', level=logging.DEBUG)
+
+
+def log(message):
+    with open('django.log', 'a+') as f:
+        f.write(message)
 
 
 def test(request, *args, **kwargs):
@@ -35,12 +40,13 @@ def question(request, question_pk):
 
 
 def ask(request):
-    logging.debug('Ask method running')
+    log('Before condition\n')
     if request.method == 'POST':
-        logging.debug('POST method using in ask')
+        log('POST\n')
         form = AskForm(request.POST)
+        log('%s' % form)
         if form.is_valid():
-            logging.debug('Form is valid')
+            log('form is vaild')
             question = form.save(commit=False)
 
             try:
@@ -51,7 +57,7 @@ def ask(request):
             return HttpResponseRedirect(reverse('question', kwargs={'question_pk': question.pk}))
 
     else:
-        logging.debug('GET method using')
+        log('GET')
         form = AskForm()
     return render(request, 'ask.html', {'form': form})
 
