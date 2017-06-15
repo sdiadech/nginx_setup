@@ -28,7 +28,7 @@ class Answer(models.Model):
     text = models.TextField()
     added_at = models.DateTimeField(auto_now_add=True)
     question = models.ForeignKey(Question)
-    author = models.ForeignKey(User, related_name='answer_author')
+    author = models.ForeignKey(User, default=1, related_name='answer_author')
 
     def __unicode__(self):
         return self.title
