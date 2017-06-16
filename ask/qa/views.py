@@ -39,7 +39,7 @@ def login(request):
             user = form.save()
             if user is not None:
                 log_in(request, user)
-                return HttpResponseRedirect(reverse('new'))
+                return HttpResponseRedirect(reverse(new))
     form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
@@ -56,7 +56,7 @@ def signup(request):
             new_user.save()
             new_user = authenticate(username=username, password=password)
             log_in(request, new_user)
-            return HttpResponseRedirect(reverse('new'))
+            return HttpResponseRedirect(reverse(new))
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
